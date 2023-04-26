@@ -63,9 +63,9 @@ async def remove_contact(contact_id: int = Path(ge=1), db: Session = Depends(get
     return contact
 
 
-@router.get('/birthdays', response_model=list[ContactResponse])
-async def this_week_birthdays(db: Session = Depends(get_db)):
-    contacts = db.query(Contact).all()
-    contacts = [contact for contact in contacts if abs(contact.born_day - date(contact.born_day.year, date.today().day,
-                date.today().month)) < timedelta(7)]
+@router.get("/birthday/", response_model=List[ContactResponse])
+async def week_birthdays(db: Session = Depends(get_db)):
+    contacts = await repository_contacts.get_contacts_by_birthday(db)
+    if not contacts:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Not Found")
     return contacts
